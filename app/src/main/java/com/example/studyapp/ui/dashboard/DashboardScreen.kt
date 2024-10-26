@@ -9,27 +9,60 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import com.example.studyapp.R
+import com.example.studyapp.domain.model.Session
 import com.example.studyapp.domain.model.Subject
+import com.example.studyapp.domain.model.Task
 import com.example.studyapp.ui.components.CountCard
 import com.example.studyapp.ui.components.SubCard
+import com.example.studyapp.ui.components.studySessionList
 import com.example.studyapp.ui.components.taskList
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import com.example.studyapp.sessionList
+import com.example.studyapp.subjectList
+import com.example.studyapp.taskList
+import com.example.studyapp.ui.components.AddSubjectPopup
+import com.example.studyapp.ui.components.DeletePopup
 
 
 @Composable
 fun DashboardScreen(){
 
-    val subjectList = listOf(
-        Subject(name = "Math", goalHours = 10f, colors = Subject.subjectCardColors[0]),
-        Subject(name = "English", goalHours = 10f, colors = Subject.subjectCardColors[1]),
-        Subject(name = "Science", goalHours = 10f, colors = Subject.subjectCardColors[2]),
-        Subject(name = "History", goalHours = 10f, colors = Subject.subjectCardColors[3]),
-        Subject(name = "Geography", goalHours = 10f, colors = Subject.subjectCardColors[4]),
+
+    var isAddSubjectPopupOpen by rememberSaveable { mutableStateOf(false) }
+    var isDeletePopupOpen by rememberSaveable { mutableStateOf(false) }
+    var subjectName by rememberSaveable { mutableStateOf("") }
+    var goalHours by rememberSaveable { mutableStateOf("") }
+    var selectedColor by rememberSaveable { mutableStateOf(Subject.subjectCardColors.random()) }
+
+    AddSubjectPopup(
+        isOpen = isAddSubjectPopupOpen,
+        subjectName = subjectName,
+        goalHours = goalHours,
+        onSubjectNameChange = { subjectName = it},
+        onGoalHoursChange = { goalHours = it},
+        selectedColor = selectedColor,
+        onColorChange = { selectedColor = it},
+        onDismiss = { isAddSubjectPopupOpen = false},
+        onSave = {
+            isAddSubjectPopupOpen = false
+        }
+    )
+
+    DeletePopup(
+        isOpen = isDeletePopupOpen,
+        title = "Delete Subject",
+        bodyText = "Are you sure you want to delete this subject?",
+        onDismiss = { isDeletePopupOpen = false },
+        onConfirm = { isDeletePopupOpen = false }
     )
 
     Scaffold (
@@ -49,7 +82,8 @@ fun DashboardScreen(){
             item {
                 SubjectCard(
                     modifier = Modifier.fillMaxSize(),
-                    subjectList = subjectList
+                    subjectList = subjectList,
+                    onAddIconClick = { isAddSubjectPopupOpen = true }
                 )
             }
             item{
@@ -63,7 +97,18 @@ fun DashboardScreen(){
             taskList(
                 title = "Upcoming Tasks",
                 textList = "You don't have any upcoming tasks",
-                tasks = emptyList()
+                tasks = taskList,
+                onCheckBoxClick = {},
+                onTaskCardClick = {}
+            )
+            item{
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            studySessionList(
+                title = "Recent Study Sessions",
+                textList = "You Don't have any recent Study Sessions",
+                sessions = sessionList,
+                onDeleteIconClick = {isDeletePopupOpen=true}
             )
         }
     }
@@ -117,7 +162,8 @@ private fun TopCardSection(
 @Composable
 private fun SubjectCard(
     modifier: Modifier,
-    subjectList: List<Subject>
+    subjectList: List<Subject>,
+    onAddIconClick: () -> Unit
 ){
     Column(modifier = modifier) {
         Row (
@@ -130,7 +176,7 @@ private fun SubjectCard(
                 modifier = Modifier.padding(start = 12.dp),
                 style = MaterialTheme.typography.bodySmall,
             )
-            IconButton(onClick = {}) {
+            IconButton(onClick = onAddIconClick) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Delete"
