@@ -36,7 +36,7 @@ import androidx.compose.runtime.setValue
 @Composable
 fun AddSubjectPopup(
     isOpen: Boolean,
-    title: String = "Add Subject",
+    title: String,
     selectedColor: List<Color>,
     subjectName: String,
     goalHours: String,

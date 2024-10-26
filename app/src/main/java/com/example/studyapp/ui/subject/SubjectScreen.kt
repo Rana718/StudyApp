@@ -69,6 +69,7 @@ fun SubjectScreenRoute(){
 
     AddSubjectPopup(
         isOpen = isAddSubjectPopupOpen,
+        title = "Update",
         subjectName = subjectName,
         goalHours = goalHours,
         onSubjectNameChange = { subjectName = it},

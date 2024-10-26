@@ -45,6 +45,7 @@ fun DashboardScreen(){
 
     AddSubjectPopup(
         isOpen = isAddSubjectPopupOpen,
+        title = "Add Subject",
         subjectName = subjectName,
         goalHours = goalHours,
         onSubjectNameChange = { subjectName = it},

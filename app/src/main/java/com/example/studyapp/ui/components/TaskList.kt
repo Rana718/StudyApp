@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.studyapp.R
 import androidx.compose.foundation.lazy.items
-import com.example.studyapp.util.Priority
+import com.example.studyapp.util.Common
 
 
 fun LazyListScope.taskList(
@@ -91,7 +91,7 @@ private fun TaskCard(
         ){
             TaskCheckBox(
                 isComplete = task.isComplete,
-                borderColor = Priority.fromInt(task.priority).color,
+                borderColor = Common.fromInt(task.priority).color,
                 onClick = onCheckBoxClick
             )
             Spacer(modifier = Modifier.width(14.dp))

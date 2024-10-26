@@ -9,6 +9,7 @@ import com.example.studyapp.domain.model.Subject
 import com.example.studyapp.domain.model.Task
 import com.example.studyapp.ui.dashboard.DashboardScreen
 import com.example.studyapp.ui.subject.SubjectScreenRoute
+import com.example.studyapp.ui.task.TaskScreenRoute
 import com.example.studyapp.ui.theme.StudyAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,7 +18,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             StudyAppTheme {
-               SubjectScreenRoute()
+                TaskScreenRoute()
+//               SubjectScreenRoute()
 //                DashboardScreen()
             }
         }
