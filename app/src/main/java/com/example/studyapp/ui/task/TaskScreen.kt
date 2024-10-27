@@ -32,32 +32,52 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.studyapp.ui.components.TaskCheckBox
-import com.example.studyapp.ui.theme.Red
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
-import com.example.studyapp.domain.model.Subject
 import com.example.studyapp.subjectList
 import com.example.studyapp.ui.components.DeletePopup
 import com.example.studyapp.ui.components.SubjectListBottom
+import com.example.studyapp.ui.components.TaskCheckBox
 import com.example.studyapp.ui.components.TaskDatePicker
+import com.example.studyapp.ui.theme.Red
 import com.example.studyapp.util.Common
 import com.example.studyapp.util.changeMillisToDateString
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import java.time.Instant
 
 
+data class TaskScreenNavArgs(
+    val taskId: Int?,
+    val subjectId: Int?
+)
+
+@Destination(navArgsDelegate = TaskScreenNavArgs::class)
+@Composable
+fun TaskScreenRoute(
+    navigator: DestinationsNavigator
+){
+    TaskScreen(
+        onBackButtonClick = { navigator.navigateUp() }
+    )
+}
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TaskScreenRoute(){
+private fun TaskScreen(
+    onBackButtonClick: () -> Unit
+){
 
     var isDatePickerDialogOpen by rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
@@ -93,7 +113,10 @@ fun TaskScreenRoute(){
         state = datePickerState,
         isOpen = isDatePickerDialogOpen,
         onDismissRequest = { isDatePickerDialogOpen =false},
-        onConfirmButtonClicked = { isDatePickerDialogOpen = false}
+        onConfirmButtonClicked = { selectedDateMillis ->
+            datePickerState.selectedDateMillis = selectedDateMillis
+            isDatePickerDialogOpen = false
+        }
     )
 
     SubjectListBottom (
@@ -115,7 +138,7 @@ fun TaskScreenRoute(){
                 isComplete = false,
                 isTaskExist = true,
                 checkBoxBorderColor = Red,
-                onBackButtonClick = { },
+                onBackButtonClick = onBackButtonClick,
                 onDeleteButtonClick = { isDeletePopupOpen=true },
                 onCheckBoxClick = { }
             )

@@ -31,12 +31,43 @@ import com.example.studyapp.subjectList
 import com.example.studyapp.taskList
 import com.example.studyapp.ui.components.AddSubjectPopup
 import com.example.studyapp.ui.components.DeletePopup
+import com.example.studyapp.ui.destinations.SessionScreenRouteDestination
+import com.example.studyapp.ui.destinations.SubjectScreenRouteDestination
+import com.example.studyapp.ui.destinations.TaskScreenRouteDestination
+import com.example.studyapp.ui.subject.SubjectScreenNavArgs
+import com.example.studyapp.ui.task.TaskScreenNavArgs
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+@Destination(start = true)
+@Composable
+fun DashboardScreenRoute(
+    navigator: DestinationsNavigator
+){
+    DashboardScreen(
+        onSubjectCardClick = { subjectId ->
+            subjectId?.let {
+                val navArg = SubjectScreenNavArgs(subjectId = subjectId)
+                navigator.navigate(SubjectScreenRouteDestination(navArgs = navArg))
+            }
+        },
+        onTaskCardClick = {
+            val navArg = TaskScreenNavArgs(taskId = it, subjectId = null)
+            navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
+        },
+        onSessionCardClick = {
+            navigator.navigate(SessionScreenRouteDestination())
+        }
+    )
+}
 
 
 @Composable
-fun DashboardScreen(){
-
-
+fun DashboardScreen(
+    onSubjectCardClick: (Int?) -> Unit,
+    onTaskCardClick: (Int?) -> Unit,
+    onSessionCardClick: () -> Unit
+){
     var isAddSubjectPopupOpen by rememberSaveable { mutableStateOf(false) }
     var isDeletePopupOpen by rememberSaveable { mutableStateOf(false) }
     var subjectName by rememberSaveable { mutableStateOf("") }
@@ -84,13 +115,14 @@ fun DashboardScreen(){
                 SubjectCard(
                     modifier = Modifier.fillMaxSize(),
                     subjectList = subjectList,
-                    onAddIconClick = { isAddSubjectPopupOpen = true }
+                    onAddIconClick = { isAddSubjectPopupOpen = true },
+                    onSubjectCardClick = onSubjectCardClick
                 )
             }
             item{
                 Button(
                     modifier = Modifier.fillMaxSize().padding(horizontal = 48.dp, vertical = 20.dp),
-                    onClick = {},
+                    onClick = onSessionCardClick,
                 ) {
                     Text(text = "Start Study Session")
                 }
@@ -100,7 +132,7 @@ fun DashboardScreen(){
                 textList = "You don't have any upcoming tasks",
                 tasks = taskList,
                 onCheckBoxClick = {},
-                onTaskCardClick = {}
+                onTaskCardClick = onTaskCardClick
             )
             item{
                 Spacer(modifier = Modifier.height(12.dp))
@@ -164,7 +196,8 @@ private fun TopCardSection(
 private fun SubjectCard(
     modifier: Modifier,
     subjectList: List<Subject>,
-    onAddIconClick: () -> Unit
+    onAddIconClick: () -> Unit,
+    onSubjectCardClick: (Int?) -> Unit,
 ){
     Column(modifier = modifier) {
         Row (
@@ -206,7 +239,7 @@ private fun SubjectCard(
                 SubCard(
                     subjectName = it.name,
                     gradientColors = it.colors,
-                    onClick = {}
+                    onClick = {onSubjectCardClick(it.subjectId)}
                 )
             }
         }

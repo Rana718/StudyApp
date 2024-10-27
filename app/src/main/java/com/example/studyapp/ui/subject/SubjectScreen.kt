@@ -30,29 +30,61 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.studyapp.ui.components.CountCard
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import com.example.studyapp.domain.model.Subject
 import com.example.studyapp.sessionList
 import com.example.studyapp.ui.components.AddSubjectPopup
+import com.example.studyapp.ui.components.CountCard
 import com.example.studyapp.ui.components.DeletePopup
 import com.example.studyapp.ui.components.studySessionList
 import com.example.studyapp.ui.components.taskList
+import com.example.studyapp.ui.destinations.TaskScreenRouteDestination
+import com.example.studyapp.ui.task.TaskScreenNavArgs
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+data class SubjectScreenNavArgs(
+    val subjectId: Int
+)
+
+@Destination(navArgsDelegate = SubjectScreenNavArgs::class)
+@Composable
+fun SubjectScreenRoute(
+    navigator: DestinationsNavigator
+){
+    SubjectScreen(
+        onBackButtonClick = { navigator.navigateUp() },
+        onAddTaskButtonClick = {
+            val navArg = TaskScreenNavArgs(taskId = null, subjectId = -1)
+            navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
+        },
+        onTaskCardClick = {taskID ->
+            val navArg = TaskScreenNavArgs(taskId = taskID, subjectId = null)
+            navigator.navigate(TaskScreenRouteDestination(navArgs = navArg))
+        }
+    )
+}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SubjectScreenRoute(){
+private fun SubjectScreen(
+    onBackButtonClick: () -> Unit,
+    onAddTaskButtonClick: () -> Unit,
+    onTaskCardClick: (Int?) -> Unit
+){
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val listState = rememberLazyListState()
@@ -103,7 +135,7 @@ fun SubjectScreenRoute(){
         topBar = {
             SubjectScreenTopBa(
                 title = "English",
-                onBackButtonClick = {},
+                onBackButtonClick = onBackButtonClick,
                 onDeleteButtonClick = { isDeletePopupOpen = true },
                 onEditButtonClick = { isAddSubjectPopupOpen = true},
                 scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -111,7 +143,7 @@ fun SubjectScreenRoute(){
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = {},
+                onClick = onAddTaskButtonClick,
                 icon = {Icon(imageVector = Icons.Default.Add, contentDescription = "Add")},
                 text = {Text(text = "Add Task")},
                 expanded = isFABExpanded
@@ -135,7 +167,7 @@ fun SubjectScreenRoute(){
                 textList = "You don't have any upcoming tasks",
                 tasks = com.example.studyapp.taskList,
                 onCheckBoxClick = {},
-                onTaskCardClick = {}
+                onTaskCardClick = onTaskCardClick
             )
             item{
                 Spacer(modifier = Modifier.height(12.dp))
@@ -145,7 +177,7 @@ fun SubjectScreenRoute(){
                 textList = "You don't have any Completed tasks",
                 tasks = com.example.studyapp.taskList,
                 onCheckBoxClick = {},
-                onTaskCardClick = {}
+                onTaskCardClick = onTaskCardClick
             )
             item{
                 Spacer(modifier = Modifier.height(12.dp))

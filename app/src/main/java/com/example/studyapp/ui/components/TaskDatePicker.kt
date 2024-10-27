@@ -1,9 +1,7 @@
 package com.example.studyapp.ui.components
 
-
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
@@ -15,13 +13,30 @@ fun TaskDatePicker(
     confirmButtonText: String = "OK",
     dismissButtonText: String = "Cancel",
     onDismissRequest: () -> Unit,
-    onConfirmButtonClicked: () -> Unit
+    onConfirmButtonClicked: (Long?) -> Unit
 ) {
+
+    val todayMillis = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val tomorrowMillis = LocalDate.now().plusDays(1)
+        .atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val state = rememberDatePickerState(
+        initialSelectedDateMillis = tomorrowMillis,
+        selectableDates = object : SelectableDates {
+            override fun isSelectableDate(dateMillis: Long): Boolean {
+                return dateMillis >= todayMillis
+            }
+        }
+    )
+
+
     if (isOpen) {
         DatePickerDialog(
             onDismissRequest = onDismissRequest,
             confirmButton = {
-                TextButton(onClick = onConfirmButtonClicked) {
+                TextButton(onClick = {
+                    onConfirmButtonClicked(state.selectedDateMillis)
+                    onDismissRequest()
+                }) {
                     Text(text = confirmButtonText)
                 }
             },
