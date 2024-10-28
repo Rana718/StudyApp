@@ -26,6 +26,8 @@ import com.example.studyapp.ui.components.studySessionList
 import com.example.studyapp.ui.components.taskList
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.studyapp.sessionList
 import com.example.studyapp.subjectList
 import com.example.studyapp.taskList
@@ -44,7 +46,12 @@ import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 fun DashboardScreenRoute(
     navigator: DestinationsNavigator
 ){
+
+    val viewModel: DashboardViewModel = hiltViewModel()
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
     DashboardScreen(
+        state = state,
         onSubjectCardClick = { subjectId ->
             subjectId?.let {
                 val navArg = SubjectScreenNavArgs(subjectId = subjectId)
@@ -64,6 +71,7 @@ fun DashboardScreenRoute(
 
 @Composable
 fun DashboardScreen(
+    state: DashboardState,
     onSubjectCardClick: (Int?) -> Unit,
     onTaskCardClick: (Int?) -> Unit,
     onSessionCardClick: () -> Unit
@@ -235,11 +243,11 @@ private fun SubjectCard(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(start = 12.dp, end = 12.dp)
         ){
-            items(subjectList){ it ->
+            items(subjectList){ subject ->
                 SubCard(
-                    subjectName = it.name,
-                    gradientColors = it.colors,
-                    onClick = {onSubjectCardClick(it.subjectId)}
+                    subjectName = subject.name,
+                    gradientColors = subject.colors.map { Color(it) },
+                    onClick = {onSubjectCardClick(subject.subjectId)}
                 )
             }
         }
