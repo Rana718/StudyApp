@@ -207,7 +207,7 @@ private fun SubjectScreen(
                 title = "Upcoming Tasks",
                 textList = "You don't have any upcoming tasks",
                 tasks = state.upcomingTasks,
-                onCheckBoxClick = {},
+                onCheckBoxClick = { onEvent(SubjectEvent.OnTaskIsCompleteChange(it)) },
                 onTaskCardClick = onTaskCardClick
             )
             item{
@@ -217,7 +217,7 @@ private fun SubjectScreen(
                 title = "Completed Tasks",
                 textList = "You don't have any Completed tasks",
                 tasks = state.completedTasks,
-                onCheckBoxClick = {},
+                onCheckBoxClick = { onEvent(SubjectEvent.OnTaskIsCompleteChange(it))},
                 onTaskCardClick = onTaskCardClick
             )
             item{

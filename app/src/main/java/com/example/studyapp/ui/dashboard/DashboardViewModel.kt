@@ -94,7 +94,9 @@ class DashboardViewModel @Inject constructor(
                     it.copy(goalStudyHours = event.hours)
                 }
             }
-            is DashboardEvent.OnTaskIsCompleteChange -> {}
+            is DashboardEvent.OnTaskIsCompleteChange -> {
+                updateTask(event.task)
+            }
             DashboardEvent.SaveSubject -> saveSubject()
         }
     }
@@ -128,6 +130,25 @@ class DashboardViewModel @Inject constructor(
                 )
             }
 
+        }
+    }
+    private fun updateTask(task: Task) {
+        viewModelScope.launch {
+            try {
+                taskRepo.upsertTask(
+                    task = task.copy(isComplete = !task.isComplete)
+                )
+                _snackbarEventFlow.emit(
+                    SnackbarEvent.ShowSnackbar(message = "Saved in completed tasks.")
+                )
+            } catch (e: Exception) {
+                _snackbarEventFlow.emit(
+                    SnackbarEvent.ShowSnackbar(
+                        message = "Error while updating Task. ${e.message}",
+                        duration = SnackbarDuration.Long
+                    )
+                )
+            }
         }
     }
 
