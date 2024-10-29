@@ -2,15 +2,15 @@ package com.example.studyapp.util
 
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.ui.graphics.Color
-import androidx.core.app.NotificationCompat.MessagingStyle.Message
-import com.example.studyapp.ui.theme.*
-import java.time.Duration
+import com.example.studyapp.ui.theme.Green
+import com.example.studyapp.ui.theme.Orange
+import com.example.studyapp.ui.theme.Red
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-enum class Common(val title: String, val color: Color, val value: Int) {
+enum class Priority(val title: String, val color: Color, val value: Int) {
     LOW(title = "Low", color = Green, value = 0),
     MEDIUM(title = "Medium", color = Orange, value = 1),
     HIGH(title = "High", color = Red, value = 2);
