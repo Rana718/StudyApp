@@ -256,13 +256,13 @@ private fun SubjectOverviewSection(
        CountCard(
            modifier = Modifier.weight(1f),
            ItemName = "Goal Study Hours",
-           count = goalHours.toInt()
+           count = goalHours
        )
        Spacer(modifier = Modifier.width(10.dp))
        CountCard(
            modifier = Modifier.weight(1f),
            ItemName = "Studied Hours",
-           count = studiedHours.toInt()
+           count = studiedHours
        )
        Spacer(modifier = Modifier.width(10.dp))
        Box(

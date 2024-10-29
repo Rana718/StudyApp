@@ -1,9 +1,12 @@
 package com.example.studyapp.domain.model
 
-import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.studyapp.ui.theme.*
+import com.example.studyapp.ui.theme.gradient1
+import com.example.studyapp.ui.theme.gradient2
+import com.example.studyapp.ui.theme.gradient3
+import com.example.studyapp.ui.theme.gradient4
+import com.example.studyapp.ui.theme.gradient5
 
 
 @Entity

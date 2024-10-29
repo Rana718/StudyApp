@@ -1,38 +1,52 @@
 package com.example.studyapp.ui.dashboard
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.*
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.studyapp.R
 import com.example.studyapp.domain.model.Session
 import com.example.studyapp.domain.model.Subject
 import com.example.studyapp.domain.model.Task
+import com.example.studyapp.ui.components.AddSubjectPopup
 import com.example.studyapp.ui.components.CountCard
+import com.example.studyapp.ui.components.DeletePopup
 import com.example.studyapp.ui.components.SubCard
 import com.example.studyapp.ui.components.studySessionList
 import com.example.studyapp.ui.components.taskList
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.studyapp.sessionList
-import com.example.studyapp.subjectList
-import com.example.studyapp.taskList
-import com.example.studyapp.ui.components.AddSubjectPopup
-import com.example.studyapp.ui.components.DeletePopup
 import com.example.studyapp.ui.destinations.SessionScreenRouteDestination
 import com.example.studyapp.ui.destinations.SubjectScreenRouteDestination
 import com.example.studyapp.ui.destinations.TaskScreenRouteDestination
@@ -49,9 +63,14 @@ fun DashboardScreenRoute(
 
     val viewModel: DashboardViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val tasks  by viewModel.tasks.collectAsStateWithLifecycle()
+    val recentSession by viewModel.recentSessions.collectAsStateWithLifecycle()
 
     DashboardScreen(
         state = state,
+        tasks = tasks,
+        recentSession = recentSession,
+        onEvent = viewModel::onEvent,
         onSubjectCardClick = { subjectId ->
             subjectId?.let {
                 val navArg = SubjectScreenNavArgs(subjectId = subjectId)
@@ -72,27 +91,28 @@ fun DashboardScreenRoute(
 @Composable
 fun DashboardScreen(
     state: DashboardState,
+    tasks: List<Task>,
+    recentSession: List<Session>,
+    onEvent: (DashboardEvent) -> Unit,
     onSubjectCardClick: (Int?) -> Unit,
     onTaskCardClick: (Int?) -> Unit,
     onSessionCardClick: () -> Unit
 ){
     var isAddSubjectPopupOpen by rememberSaveable { mutableStateOf(false) }
     var isDeletePopupOpen by rememberSaveable { mutableStateOf(false) }
-    var subjectName by rememberSaveable { mutableStateOf("") }
-    var goalHours by rememberSaveable { mutableStateOf("") }
-    var selectedColor by rememberSaveable { mutableStateOf(Subject.subjectCardColors.random()) }
 
     AddSubjectPopup(
         isOpen = isAddSubjectPopupOpen,
         title = "Add Subject",
-        subjectName = subjectName,
-        goalHours = goalHours,
-        onSubjectNameChange = { subjectName = it},
-        onGoalHoursChange = { goalHours = it},
-        selectedColor = selectedColor,
-        onColorChange = { selectedColor = it},
+        subjectName = state.subjectName,
+        goalHours = state.goalStudyHours,
+        onSubjectNameChange = { onEvent(DashboardEvent.OnSubjectNameChange(it)) },
+        onGoalHoursChange = { onEvent(DashboardEvent.OnGoalStudyHoursChange(it)) },
+        selectedColor = state.subjectCardColors,
+        onColorChange = { onEvent(DashboardEvent.OnSubjectCardColorChange(it))},
         onDismiss = { isAddSubjectPopupOpen = false},
         onSave = {
+            onEvent(DashboardEvent.SaveSubject)
             isAddSubjectPopupOpen = false
         }
     )
@@ -102,7 +122,10 @@ fun DashboardScreen(
         title = "Delete Subject",
         bodyText = "Are you sure you want to delete this subject?",
         onDismiss = { isDeletePopupOpen = false },
-        onConfirm = { isDeletePopupOpen = false }
+        onConfirm = {
+            onEvent(DashboardEvent.DeleteSession)
+            isDeletePopupOpen = false
+        }
     )
 
     Scaffold (
@@ -114,15 +137,15 @@ fun DashboardScreen(
             item{
                 TopCardSection(
                     modifier = Modifier.fillMaxSize().padding(12.dp),
-                    Count = 5,
-                    studiedHours = 10,
-                    goalHours = 20
+                    Count = state.totalSubjectCount,
+                    studiedHours = state.totalStudiedHours.toString(),
+                    goalHours = state.totalGoalStudyHours.toString()
                 )
             }
             item {
                 SubjectCard(
                     modifier = Modifier.fillMaxSize(),
-                    subjectList = subjectList,
+                    subjectList = state.subjects,
                     onAddIconClick = { isAddSubjectPopupOpen = true },
                     onSubjectCardClick = onSubjectCardClick
                 )
@@ -138,8 +161,8 @@ fun DashboardScreen(
             taskList(
                 title = "Upcoming Tasks",
                 textList = "You don't have any upcoming tasks",
-                tasks = taskList,
-                onCheckBoxClick = {},
+                tasks = tasks,
+                onCheckBoxClick = { onEvent(DashboardEvent.OnTaskIsCompleteChange(it))},
                 onTaskCardClick = onTaskCardClick
             )
             item{
@@ -148,8 +171,11 @@ fun DashboardScreen(
             studySessionList(
                 title = "Recent Study Sessions",
                 textList = "You Don't have any recent Study Sessions",
-                sessions = sessionList,
-                onDeleteIconClick = {isDeletePopupOpen=true}
+                sessions = recentSession,
+                onDeleteIconClick = {
+                    onEvent(DashboardEvent.OnDeleteSessionButtonClick(it))
+                    isDeletePopupOpen=true
+                }
             )
         }
     }
@@ -173,8 +199,8 @@ private fun DashboardScreenTopBar(){
 private fun TopCardSection(
     modifier: Modifier,
     Count: Int,
-    studiedHours: Int,
-    goalHours: Int
+    studiedHours: String,
+    goalHours: String
 ){
     Row (
         modifier = modifier
@@ -182,7 +208,7 @@ private fun TopCardSection(
         CountCard(
             modifier = Modifier.weight(1f),
             ItemName = "Subjects",
-            count = Count
+            count = Count.toString()
         )
         Spacer(modifier = Modifier.width(10.dp))
         CountCard(

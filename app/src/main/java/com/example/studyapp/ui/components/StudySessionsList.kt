@@ -33,7 +33,7 @@ fun LazyListScope.studySessionList(
     title: String,
     textList: String,
     sessions: List<Session>,
-    onDeleteIconClick: () -> Unit
+    onDeleteIconClick: (Session) -> Unit
 ){
     item{
         Text(
@@ -67,7 +67,7 @@ fun LazyListScope.studySessionList(
         StudySessionCard (
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
             session = session,
-            onDeleteIconClick = { onDeleteIconClick()}
+            onDeleteIconClick = { onDeleteIconClick(session)}
         )
     }
 }
