@@ -45,8 +45,9 @@ fun SubCard(
             )
             Text(
                 text = subjectName,
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White
+                style = MaterialTheme.typography.headlineMedium,
+                color = Color.White,
+                maxLines = 1
             )
         }
     }
