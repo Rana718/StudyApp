@@ -23,10 +23,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,8 +56,11 @@ import com.example.studyapp.ui.destinations.SubjectScreenRouteDestination
 import com.example.studyapp.ui.destinations.TaskScreenRouteDestination
 import com.example.studyapp.ui.subject.SubjectScreenNavArgs
 import com.example.studyapp.ui.task.TaskScreenNavArgs
+import com.example.studyapp.util.SnackbarEvent
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collectLatest
 
 @Destination(start = true)
 @Composable
@@ -70,6 +77,7 @@ fun DashboardScreenRoute(
         state = state,
         tasks = tasks,
         recentSession = recentSession,
+        snackbarEvent = viewModel.snackbarEventFlow,
         onEvent = viewModel::onEvent,
         onSubjectCardClick = { subjectId ->
             subjectId?.let {
@@ -93,6 +101,7 @@ fun DashboardScreen(
     state: DashboardState,
     tasks: List<Task>,
     recentSession: List<Session>,
+    snackbarEvent: SharedFlow<SnackbarEvent>,
     onEvent: (DashboardEvent) -> Unit,
     onSubjectCardClick: (Int?) -> Unit,
     onTaskCardClick: (Int?) -> Unit,
@@ -100,6 +109,20 @@ fun DashboardScreen(
 ){
     var isAddSubjectPopupOpen by rememberSaveable { mutableStateOf(false) }
     var isDeletePopupOpen by rememberSaveable { mutableStateOf(false) }
+    var snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(key1 = true){
+        snackbarEvent.collectLatest { event ->
+            when(event){
+                is SnackbarEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        duration = event.duration
+                    )
+                }
+            }
+        }
+    }
 
     AddSubjectPopup(
         isOpen = isAddSubjectPopupOpen,
@@ -129,6 +152,7 @@ fun DashboardScreen(
     )
 
     Scaffold (
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = { DashboardScreenTopBar() }
     ){ paddingValues ->
         LazyColumn (
