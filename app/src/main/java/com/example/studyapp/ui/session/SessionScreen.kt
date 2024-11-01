@@ -35,8 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.studyapp.sessionList
-import com.example.studyapp.subjectList
 import com.example.studyapp.ui.components.DeletePopup
 import com.example.studyapp.ui.components.SubjectListBottom
 import com.example.studyapp.ui.components.studySessionList
@@ -74,7 +72,7 @@ private fun SessionScreen(
     SubjectListBottom (
         sheetState = sheetState,
         isOpen = isBottomSheetOpen,
-        subjects = subjectList,
+        subjects = ,
         onDismiss = { isBottomSheetOpen = false},
         onSubjectClick = {
             scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -123,7 +121,7 @@ private fun SessionScreen(
             studySessionList(
                 title = "Recent Study Sessions",
                 textList = "You Don't have any recent Study Sessions",
-                sessions = sessionList,
+                sessions = ,
                 onDeleteIconClick = {isDeletePopupOpen=true}
             )
         }
