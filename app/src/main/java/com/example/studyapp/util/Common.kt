@@ -44,3 +44,7 @@ sealed class SnackbarEvent{
 
     data object NavigateUp: SnackbarEvent()
 }
+
+fun Int.pad(): String {
+    return this.toString().padStart(length = 2, padChar = '0')
+}
