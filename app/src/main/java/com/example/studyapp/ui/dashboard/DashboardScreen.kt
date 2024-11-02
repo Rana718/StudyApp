@@ -58,11 +58,13 @@ import com.example.studyapp.ui.subject.SubjectScreenNavArgs
 import com.example.studyapp.ui.task.TaskScreenNavArgs
 import com.example.studyapp.util.SnackbarEvent
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collectLatest
 
-@Destination(start = true)
+@RootNavGraph(start = true)
+@Destination
 @Composable
 fun DashboardScreenRoute(
     navigator: DestinationsNavigator

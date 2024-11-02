@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,15 +25,14 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private var isBound by mutableStateOf(false)
     private lateinit var timerService: StudySessionTimerService
-
-    private val connection = object : ServiceConnection{
-        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+    private val connection = object : ServiceConnection {
+        override fun onServiceConnected(p0: ComponentName?, service: IBinder?) {
             val binder = service as StudySessionTimerService.StudySessionTimerBinder
             timerService = binder.getService()
             isBound = true
         }
 
-        override fun onServiceDisconnected(name: ComponentName?) {
+        override fun onServiceDisconnected(p0: ComponentName?) {
             isBound = false
         }
     }
@@ -46,13 +44,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
-            if(isBound){
-                StudyAppTheme {
+
+                StudyAppTheme  {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         dependenciesContainerBuilder = {
@@ -60,7 +56,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }
-            }
+
         }
         requestPermission()
     }
