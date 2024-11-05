@@ -47,8 +47,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-                StudyAppTheme  {
+            if(isBound) {
+                StudyAppTheme {
                     DestinationsNavHost(
                         navGraph = NavGraphs.root,
                         dependenciesContainerBuilder = {
@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }
-
+            }
         }
         requestPermission()
     }
