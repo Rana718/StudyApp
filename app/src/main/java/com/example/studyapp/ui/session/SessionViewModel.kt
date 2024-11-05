@@ -114,12 +114,13 @@ class SessionViewModel @Inject constructor(
                 )
                 return@launch
             }
+            val currentTimestamp = Instant.now().toEpochMilli()
             try{
                 sessionRepo.insertSession(
                     session = Session(
                         sessionSubjectId = state.value.subjectId ?: -1,
                         relatedToSubject = state.value.relatedToSubject ?: "",
-                        date = Instant.now().toEpochMilli(),
+                        date = currentTimestamp,
                         duration = duration
                     )
                 )

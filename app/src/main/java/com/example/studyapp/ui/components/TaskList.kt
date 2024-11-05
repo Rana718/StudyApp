@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.example.studyapp.R
 import com.example.studyapp.domain.model.Task
 import com.example.studyapp.util.Priority
+import com.example.studyapp.util.formatTimeStamp
 
 
 fun LazyListScope.taskList(
@@ -107,7 +108,7 @@ private fun TaskCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "${task.dueDate}",
+                    text = "${formatTimeStamp(task.dueDate)}",
                     style = MaterialTheme.typography.bodySmall
                 )
             }

@@ -260,7 +260,7 @@ private fun TaskScreen(
             }
             Button(
                 enabled = taskTitleError == null,
-                onClick = { onEvent(TaskEvent.SaveTask) },
+                onClick = {onEvent(TaskEvent.SaveTask)} ,
                 modifier = Modifier.fillMaxWidth().padding(vertical = 20.dp)
             ){
                 Text(text = "Save")
